@@ -1,2 +1,3 @@
-# attractive-arete
+# Elated eel
+
 Extended library for C

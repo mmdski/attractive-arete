@@ -45,7 +45,8 @@
             "cStandard": "c99",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-arm64",
-            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+            "configurationProvider": "ms-vscode.cmake-tools"
         },
         {
             "name": "Win32",
