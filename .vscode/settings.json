@@ -4,11 +4,12 @@
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "editor.tabSize": 2,
-    "cmake.configureArgs": [
-        "-DTESTS=1",
-        "-DASAN=1",
-        "-DLSAN=1",
-        "-DAPP=1"
-    ],
+    "cmake.generator": "Ninja",
+    "cmake.configureSettings": {
+        "TESTS": 1,
+        "ASAN": 1,
+        "LSAN": 1,
+        "APP": 1,
+    },
     "cmake.launchBehavior": "reuseTerminal"
 }
