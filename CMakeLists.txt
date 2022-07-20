@@ -25,11 +25,13 @@ endif()
 # set check arguments
 add_compile_definitions(CHECK_ARGS)
 
-# include_directories(include)
+include_directories(include)
 
-# add_subdirectory(src)
+add_subdirectory(src)
+
 macro(add_eel_exe basename)
   add_executable(${basename} ${basename}.c)
+  target_link_libraries(${basename} PRIVATE eel)
 endmacro()
 
 # if(APP)
