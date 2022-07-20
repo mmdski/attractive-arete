@@ -50,3 +50,18 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# macOS shenanigans
+.DS_store
+
+# python environment
+env/
+
+# build directory
+build*/
+
+# sphinx docs
+docs/_build
+
+# doxygen xml
+docs/xml
