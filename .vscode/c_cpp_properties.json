@@ -23,7 +23,8 @@
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "compilerArgs": [
-                "-DCHECK_ARGS"
+                "-DCHECK_ARGS",
+                "-DTESTING"
             ],
             "cStandard": "c99",
             "intelliSenseMode": "linux-gcc-x64"
