@@ -1,3 +1,4 @@
+# determine if ASAN and LSAN are available
 # Windows compiler
 if(MSVC)
   # add ASAN flag https://docs.microsoft.com/en-us/cpp/sanitizers/asan
@@ -22,7 +23,7 @@ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
     set(ASAN_AVAIL True)
     set(LSAN_AVAIL False)
 
-  # assume everything else has neither
+  # assume anything else on macOS has neither
   else()
     set(ASAN_AVAIL False)
     set(LSAN_AVAIL False)
@@ -35,22 +36,23 @@ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   set(ASAN_AVAIL True)
   set(LSAN_AVAIL True)
 
-# unknown, assume no
+# unknown, assume no ASAN or LSAN
 else()
   set(ASAN_AVAIL False)
   set(LSAN_AVAIL False)
 endif()
 
-if(ASAN AND ASAN_AVAIL)
+# set flags if Asans build type and ASAN and LSAN are available
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Asans" AND ASAN_AVAIL)
   set(USING_ASAN True)
   message(STATUS "Using ASAN")
   add_compile_options(${ASAN_COMPILE_OPTION})
   add_link_options(${ASAN_LINK_OPTION})
-endif()
 
-if(USING_ASAN AND(LSAN AND LSAN_AVAIL))
-  set(USING_LSAN True)
-  message(STATUS "Using LSAN")
+  if(LSAN_AVAIL)
+    set(USING_LSAN True)
+    message(STATUS "Using LSAN")
+  endif()
 endif()
 
 macro(add_eel_test basename)
@@ -92,3 +94,7 @@ endif()
 if(CHECK_ARGS)
   add_chlib_test(test_check_args)
 endif()
+
+add_eel_test(test_error)
+add_eel_test(test_exit)
+add_eel_test(test_string)

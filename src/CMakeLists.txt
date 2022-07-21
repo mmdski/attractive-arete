@@ -1,5 +1,8 @@
 add_library(eel
+  error.c
   exit.c
+  memory.c
+  string.c
 )
 
 if(NOT MSVC)

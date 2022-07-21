@@ -26,7 +26,7 @@ eel_exit(int exit_status) {
     fputs("Fatal Error: eel_exit() call flag already set", stderr);
     exit(EXIT_FAILURE);
   } else {
-    fputs("Fatal Error: Unexpected call to eel_exit()", stderr);
+    fputs("Fatal Error: Unexpected call to eel_exit()\n", stderr);
     exit(exit_status);
   }
 }
