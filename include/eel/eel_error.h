@@ -8,7 +8,9 @@
 
 #include <stdbool.h>
 
-#include <eel/eel_string.h>
+#define MAXERRNAME 25
+#define MAXERRMESSAGE 120
+#define MAXERRSTRING 200
 
 /**
  * Error types
@@ -35,6 +37,9 @@ typedef enum {
 
   /** Value error */
   EEL_VALUE_ERROR,
+
+  /** Error stack error **/
+  EEL_ERR_STACK_ERROR,
 
   /** eel_exit() has been called */
   EEL_EXIT_CALLED,
@@ -79,32 +84,35 @@ extern void eel_err_free(EelError err);
 extern bool eel_err_is_type(EelError err, EelErrorType type);
 
 /**
- * @brief Returns the message of an error
+ * @brief Writes the message of an error to a character string
  *
  * @param err an error object
- * @returns the message of @c err
+ * @param err_message pre-allocated character string
+ * @return EelErrorType error indicator
  */
-extern EelString eel_err_message(EelError err);
+extern EelErrorType eel_err_message(EelError err, char *err_message);
 
 /**
- * @brief Returns the name the type of an error
+ * @brief Writes the name of an error to a character string
  *
  * @param err an error object
- * @returns the name of the error type of @c err
+ * @param err_name pre-allocated character string
+ * @return EelErrorType error indicator
  */
-extern EelString eel_err_name(EelError err);
+extern EelErrorType eel_err_name(EelError err, char *err_name);
 
 /**
- * @brief Returns the string representation of an error
+ * @brief Writes an error string to a character string
  *
- * @details The string representation of an error is
- *
- * <code>[error type name]: [error message]</code>
+ * @details An error string contains the name of an error and an error message.
+ * The message will be omitted if no message was provided upon the creation of
+ * @c err.
  *
  * @param err an error object
- * @returns the string representation of @c err
+ * @param err_str pre-allocated character string
+ * @return EelErrorType error indicator
  */
-extern EelString eel_err_str(EelError err);
+extern EelErrorType eel_err_str(EelError err, char *err_str);
 
 /**
  * @brief Returns the type of an error
@@ -122,12 +130,12 @@ extern EelErrorType eel_err_type(EelError err);
  * @param message error message
  * @param file file name
  * @param line line number (use __LINE__ macro)
- * @return 0 if successful, -1 otherwise
+ * @return error indicator
  */
-extern int eel_err_raise(EelErrorType type,
-                         const char  *message,
-                         const char  *file,
-                         int          line);
+extern EelErrorType eel_err_raise(EelErrorType type,
+                                  const char  *message,
+                                  const char  *file,
+                                  int          line);
 
 /**
  * @brief Returns true if an error is on the error stack, false otherwise
@@ -146,9 +154,9 @@ extern void eel_err_stack_clear(void);
  *
  * @param file file name
  * @param line line number (use __LINE__ macro)
- * @return 0 if successful, -1 otherwise
+ * @return error indicator
  */
-extern int eel_err_stack_push(const char *file, int line);
+extern EelErrorType eel_err_stack_push(const char *file, int line);
 
 /**
  * @brief Returns the error currently on the error stack
@@ -172,7 +180,7 @@ extern bool eel_err_stack_is_type(EelErrorType type);
 /**
  * @brief Print the error stack to @c stderr
  *
- * @param file file name
+ * @param file file name (use __FILE__ macro)
  * @param line line number (use __LINE__ macro)
  */
 extern void eel_err_stack_print(const char *file, int line);
@@ -183,7 +191,7 @@ extern void eel_err_stack_print(const char *file, int line);
  * @details If an error on the stack exists, prints the stack and exits the
  * program.
  *
- * @param file file name
+ * @param file file name (use __FILE__ macro)
  * @param line line number (use __LINE__ macro)
  */
 extern void eel_err_stack_check(const char *file, int line);

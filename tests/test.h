@@ -80,3 +80,12 @@
             __LINE__);                                                         \
     exit(EXIT_FAILURE);                                                        \
   }
+
+#define ASSERT_EQUALS(a, b)                                                    \
+  if (a != b) {                                                                \
+    fprintf(stderr,                                                            \
+            "Error: a and b are not equal. File %s, line %d.\n",               \
+            __FILE__,                                                          \
+            __LINE__);                                                         \
+    exit(EXIT_FAILURE);                                                        \
+  }

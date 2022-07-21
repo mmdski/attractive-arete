@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "*.h": "c"
+        "*.h": "c",
+        "sstream": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "editor.tabSize": 2,
@@ -9,5 +10,10 @@
         "TESTS": 1,
         "APP": 1
     },
-    "cmake.launchBehavior": "reuseTerminal"
+    "cmake.launchBehavior": "reuseTerminal",
+    "cSpell.words": [
+        "MAXERRMESSAGE",
+        "MAXERRNAME",
+        "MAXERRSTRING"
+    ]
 }

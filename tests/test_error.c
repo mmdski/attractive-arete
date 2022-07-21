@@ -37,7 +37,7 @@ test_raise(void) {
 
   // the error should be null after the stack is cleared
   ASSERT_NULL(eel_err_stack_get_err());
-  ASSERT_NEGATIVE(eel_err_stack_push(__FILE__, __LINE__));
+  ASSERT_EQUALS(eel_err_stack_push(__FILE__, __LINE__), EEL_ERR_STACK_ERROR);
 
   EXIT_TEST
 }

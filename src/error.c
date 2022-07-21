@@ -1,72 +1,86 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/param.h>
 
 #include <eel/eel_error.h>
 #include <eel/eel_exit.h>
-#include <eel/eel_posix.h>
 #include <eel/eel_io.h>
+#include <eel/eel_posix.h>
+#include <eel/eel_string.h>
 
 #include "memory.h"
 
 struct _EelError {
   EelErrorType type;
-  EelString    error_name;
-  EelString    message;
+  char        *error_name;
+  char        *message;
 };
 
-EelString
-eel_err_type_name(EelErrorType type) {
-  char *error_name;
+EelErrorType
+eel_err_type_name(EelErrorType type, char *error_name) {
   switch (type) {
   case EEL_NULL_ARG_ERROR:
-    error_name = "NullArgumentError";
+    eel_strlcpy(error_name, "NullArgumentError", MAXERRNAME);
     break;
   case EEL_INVALID_ARG_ERROR:
-    error_name = "InvalidArgumentError";
+    eel_strlcpy(error_name, "InvalidArgumentError", MAXERRNAME);
     break;
   case EEL_MEM_ERROR:
-    error_name = "MemoryError";
+    eel_strlcpy(error_name, "MemoryError", MAXERRNAME);
     break;
   case EEL_VALUE_ERROR:
-    error_name = "ValueError";
+    eel_strlcpy(error_name, "ValueError", MAXERRNAME);
     break;
   case EEL_EXIT_CALLED:
-    error_name = "ExitError";
+    eel_strlcpy(error_name, "ExitError", MAXERRNAME);
     break;
   case GENERAL_ERROR:
-    error_name = "GeneralError";
+    eel_strlcpy(error_name, "GeneralError", MAXERRNAME);
     break;
   default:
-    error_name = "UnnamedError";
+    eel_strlcpy(error_name, "UnnamedError", MAXERRNAME);
   }
 
-  return eel_string_new(error_name);
+  return EEL_NO_ERROR;
 }
 
 EelError
 eel_err_new(EelErrorType type, const char *message) {
   EelError err;
   NEW(err);
-  err->type       = type;
-  err->error_name = eel_err_type_name(type);
 
+  char *error_name = eel_alloc(MAXERRNAME * sizeof(char));
+  if (eel_err_type_name(type, error_name)) {
+    eel_free(error_name);
+    FREE(err);
+    return NULL;
+  }
+
+  char *error_msg;
   if (message == NULL)
-    err->message = NULL;
-  else
-    err->message = eel_string_new(message);
+    error_msg = NULL;
+  else {
+    error_msg = eel_alloc(MAXERRMESSAGE * sizeof(char));
+    eel_strlcpy(error_msg, message, MAXERRMESSAGE);
+  }
+
+  err->type       = type;
+  err->error_name = error_name;
+  err->message    = error_msg;
 
   return err;
 }
 
 void
 eel_err_free(EelError err) {
+
   if (err == NULL)
     return;
 
-  eel_string_free(err->error_name);
-  eel_string_free(err->message);
+  eel_free(err->error_name);
+  eel_free(err->message);
 
   FREE(err);
 }
@@ -85,78 +99,62 @@ eel_err_type(EelError err) {
   return err->type;
 }
 
-EelString
-eel_err_message(EelError err) {
+EelErrorType
+eel_err_message(EelError err, char *err_message) {
+
+  if (!err_message)
+    return EEL_NULL_ARG_ERROR;
+
   if (err == NULL) {
-    return NULL;
+    return EEL_NULL_ARG_ERROR;
   }
   if (err->message == NULL)
-    return NULL;
+    return EEL_NULL_ARG_ERROR;
 
-  return eel_string_copy(err->message);
+  eel_strlcpy(err_message, err->message, MAXERRMESSAGE);
+
+  return EEL_NO_ERROR;
 }
 
-EelString
-eel_err_name(EelError err) {
-  if (err == NULL) {
-    return NULL;
-  }
+EelErrorType
+eel_err_name(EelError err, char *error_name) {
 
-  return eel_string_copy(err->error_name);
-}
+  if (!error_name)
+    return EEL_NULL_ARG_ERROR;
 
-EelString
-eel_err_str(EelError err) {
   if (err == NULL)
-    return NULL;
+    return EEL_NULL_ARG_ERROR;
 
-  char *err_name;
-  if (eel_string_get(err->error_name, &err_name) < 0)
-    return NULL;
+  eel_strlcpy(error_name, err->error_name, MAXERRNAME);
 
-  EelString err_str;
+  return EEL_NO_ERROR;
+}
 
-  // no message, return only the error name
-  if (err->message == NULL) {
-    err_str = eel_string_new(err_name);
-    if (err_str == NULL)
-      goto fail;
+EelErrorType
+eel_err_str(EelError err, char *err_str) {
+
+  if (err == NULL)
+    return EEL_NULL_ARG_ERROR;
+
+  // return the full string if message is not null
+  if (err->message != NULL) {
+    eel_snprintf(
+        err_str, MAXERRSTRING, "%s: %s", err->error_name, err->message);
   }
-  // otherwise, return the full string
+  // otherwise, return only the error name
   else {
-    long name_len;
-    if (eel_string_len(err->error_name, &name_len) < 0)
-      goto fail;
-
-    long message_len;
-    if (eel_string_len(err->message, &message_len) < 0)
-      goto fail;
-
-    char *message;
-    if (eel_string_get(err->message, &message) < 0)
-      goto fail;
-
-    char err_str_buffer[500];
-    if (eel_sprintf(err_str_buffer, "%s: %s", err_name, message) < 0)
-      goto fail;
-
-    err_str = eel_string_new(err_str_buffer);
-    if (err_str == NULL)
-      goto fail;
+    eel_strlcpy(err_str, err->error_name, MAXERRNAME);
   }
 
-  return err_str;
-
-fail:
-  return NULL;
+  return EEL_NO_ERROR;
 }
 
 typedef struct _EelErrorStackNode EelErrorStackNode;
 
 struct _EelErrorStackNode {
   int                line;
-  EelString          file;
-  EelString          string;
+  char              *file;
+  char              *string;
   EelErrorStackNode *next;
 };
 
@@ -176,37 +174,39 @@ eel_err_stack_node_new(const char *file, int line) {
   EelErrorStackNode *node;
   NEW(node);
 
-  char node_string_buffer[500];
-
-  char bname[MAXPATHLEN];
-  if (eel_basename(file, bname) != EEL_NO_ERROR) {
+  char *bname = eel_alloc(MAXPATHLEN * sizeof(char));
+  if (eel_basename(file, bname)) {
+    eel_free(bname);
     FREE(node);
     return NULL;
   }
 
-  node->line = line;
-  node->file = eel_string_new(bname);
+  int   node_string_len = MAXPATHLEN + 25;
+  char *node_string     = eel_alloc(node_string_len * sizeof(char));
+  eel_snprintf(
+      node_string, node_string_len, "File \"%s\", line %i", bname, line);
 
-  eel_sprintf(node_string_buffer, "File \"%s\", line %i", bname, line);
-  node->string = eel_string_new(node_string_buffer);
-
-  node->next = NULL;
+  node->line   = line;
+  node->file   = bname;
+  node->string = node_string;
+  node->next   = NULL;
 
   return node;
 }
 
-static int
+static EelErrorType
 eel_err_stack_node_free(EelErrorStackNode *node) {
   if (node == NULL)
-    return -1;
+    return EEL_NULL_ARG_ERROR;
 
-  eel_string_free(node->file);
-  eel_string_free(node->string);
+  eel_free(node->file);
+  eel_free(node->string);
   FREE(node);
-  return 0;
+
+  return EEL_NO_ERROR;
 }
 
-int
+EelErrorType
 eel_err_raise(EelErrorType type,
               const char  *message,
               const char  *file,
@@ -222,7 +222,7 @@ eel_err_raise(EelErrorType type,
   stack.error = eel_err_new(type, message);
   stack.node  = eel_err_stack_node_new(file, line);
 
-  return 0;
+  return EEL_NO_ERROR;
 }
 
 bool
@@ -255,17 +255,17 @@ eel_err_stack_get_err(void) {
   return stack.error;
 }
 
-int
+EelErrorType
 eel_err_stack_push(const char *file, int line) {
   if (stack.error == NULL || stack.node == NULL)
-    return -1;
+    return EEL_ERR_STACK_ERROR;
 
   EelErrorStackNode *new_node = eel_err_stack_node_new(file, line);
 
   new_node->next = stack.node;
   stack.node     = new_node;
 
-  return 0;
+  return EEL_NO_ERROR;
 }
 
 bool
@@ -289,19 +289,16 @@ eel_err_stack_print(const char *file, int line) {
       stderr, "Error stack print called from \"%s\" on line %i\n", bname, line);
   fprintf(stderr, "Stack trace (most recent call last):\n");
 
-  char *string;
-
   EelErrorStackNode *node = stack.node;
   while (node != NULL) {
-    eel_string_get(node->string, &string);
-    fprintf(stderr, "\t%s\n", string);
+    fprintf(stderr, "\t%s\n", node->string);
     node = node->next;
   }
 
-  EelString err_string = eel_err_str(stack.error);
-  eel_string_get(err_string, &string);
-  fprintf(stderr, "%s\n", string);
-  eel_string_free(err_string);
+  char *err_str = eel_alloc(MAXERRSTRING * sizeof(char));
+  eel_err_str(stack.error, err_str);
+  fprintf(stderr, "%s\n", err_str);
+  eel_free(err_str);
 }
 
 void

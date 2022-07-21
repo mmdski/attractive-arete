@@ -3,7 +3,6 @@ add_library(eel
   exit.c
   memory.c
   posix.c
-  string.c
 )
 
 if(NOT MSVC)

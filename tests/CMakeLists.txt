@@ -97,4 +97,3 @@ endif()
 
 add_eel_test(test_error)
 add_eel_test(test_exit)
-add_eel_test(test_string)
