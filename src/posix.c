@@ -1,8 +1,8 @@
-#ifdef __GNUC__
-#define _GNU_SOURCE
+#if defined(__GNUC__) && !defined(__APPLE__)
+#define _GNU_SOURCE // use GNU version of basename()
 #include <string.h>
 #elif defined __APPLE__
-#include <libgen.h>
+#include <libgen.h> // basename_r is defined here for apple clang
 #endif
 
 #include <errno.h>
@@ -12,7 +12,7 @@
 #ifndef _MSC_VER
 #include <sys/param.h>
 #else
-#define MAXPATHLEN _MAX_PATH
+#define MAXPATHLEN _MAX_PATH // MAXPATHLEN not defined for MSVC
 #endif
 
 #include <eel/eel_error.h>
@@ -34,7 +34,7 @@ eel_basename(const char *path, char *bname) {
     return EEL_POSIX_ERROR;
   }
 
-#elif defined __GNUC__
+#elif defined(__GNUC__) && !defined(__APPLE__)
 
   char *bname_ptr = basename(path);
   eel_strlcpy(bname, bname_ptr, MAXPATHLEN);
