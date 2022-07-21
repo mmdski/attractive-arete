@@ -5,7 +5,7 @@
 
 void
 test_new(void) {
-  EelError err = eel_err_new(INVALID_ARGUMENT_ERROR, "Argument is invalid");
+  EelError err = eel_err_new(EEL_INVALID_ARG_ERROR, "Argument is invalid");
   ASSERT_NONNULL(err);
   eel_err_free(err);
   EXIT_TEST
@@ -13,7 +13,7 @@ test_new(void) {
 
 void
 test_free(void) {
-  EelError err = eel_err_new(INVALID_ARGUMENT_ERROR, "Argument is invalid");
+  EelError err = eel_err_new(EEL_INVALID_ARG_ERROR, "Argument is invalid");
   ASSERT_NONNULL(err);
   eel_err_free(err);
   eel_err_free(NULL);
@@ -24,7 +24,7 @@ void
 test_raise(void) {
   ASSERT_FALSE(eel_err_stack_is_err());
 
-  EelErrorType type = INVALID_ARGUMENT_ERROR;
+  EelErrorType type = EEL_INVALID_ARG_ERROR;
   ASSERT_ZERO(eel_err_raise(type, "message", __FILE__, __LINE__));
   ASSERT_TRUE(eel_err_stack_is_err());
 
@@ -54,7 +54,7 @@ test_raise_fail(void) {
 
   ASSERT_FALSE(eel_err_stack_is_err());
 
-  EelErrorType type = INVALID_ARGUMENT_ERROR;
+  EelErrorType type = EEL_INVALID_ARG_ERROR;
   ASSERT_ZERO(eel_err_raise(type, "message", __FILE__, __LINE__));
   ASSERT_TRUE(eel_err_stack_is_err());
 
@@ -67,7 +67,7 @@ test_raise_fail(void) {
 
 void
 test_stack_check_fail(void) {
-  eel_err_raise(INVALID_ARGUMENT_ERROR, "", __FILE__, __LINE__);
+  eel_err_raise(EEL_INVALID_ARG_ERROR, NULL, __FILE__, __LINE__);
   eel_exit_expected_set();
   eel_err_stack_check(__FILE__, __LINE__);
   ASSERT_TRUE(eel_exit_called());

@@ -16,22 +16,28 @@
 typedef enum {
 
   /** No error */
-  NO_ERROR = 0,
+  EEL_NO_ERROR = 0,
+
+  /** Error in system library wrapper **/
+  EEL_SYS_ERROR,
+
+  /** Error in POSIX library wrapper **/
+  EEL_POSIX_ERROR,
 
   /** Null argument error */
-  NULL_ARGUMENT_ERROR,
+  EEL_NULL_ARG_ERROR,
 
   /** Invalid argument error */
-  INVALID_ARGUMENT_ERROR,
+  EEL_INVALID_ARG_ERROR,
 
   /** Memory error */
-  MEMORY_ERROR,
+  EEL_MEM_ERROR,
 
   /** Value error */
-  VALUE_ERROR,
+  EEL_VALUE_ERROR,
 
   /** eel_exit() has been called */
-  EXIT_CALLED,
+  EEL_EXIT_CALLED,
 
   /** General error */
   GENERAL_ERROR,

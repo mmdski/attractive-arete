@@ -8,6 +8,13 @@
 
 #include <stdbool.h>
 
+#define MAXSTRLEN 1024
+
+struct _EelString {
+  long  len;
+  char *string;
+};
+
 /**
  * String object
  */
@@ -68,5 +75,8 @@ extern int eel_string_get(EelString s, char **string);
  * @returns 0 if operation was a success, -1 otherwise
  */
 extern int eel_string_len(EelString s, long *len);
+
+#define eel_strlen(str) strnlen(str, MAXSTRLEN);
+#define eel_strcpy(dst, src) strlcpy(dst, src, MAXSTRLEN);
 
 #endif

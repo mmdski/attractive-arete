@@ -4,25 +4,25 @@
 
 #define RAISE_NULL_ERR_INT                                                     \
   {                                                                            \
-    eel_err_raise(NULL_ARGUMENT_ERROR, NULL, __FILE__, __LINE__);              \
-    return NULL_ARGUMENT_ERROR;                                                \
+    eel_err_raise(EEL_NULL_ARG_ERROR, NULL, __FILE__, __LINE__);               \
+    return EEL_NULL_ARG_ERROR;                                                 \
   }
 
 #define RAISE_NULL_ERR_NULL                                                    \
   {                                                                            \
-    eel_err_raise(NULL_ARGUMENT_ERROR, NULL, __FILE__, __LINE__);              \
+    eel_err_raise(EEL_NULL_ARG_ERROR, NULL, __FILE__, __LINE__);               \
     return NULL;                                                               \
   }
 
 #define RAISE_ARG_ERR_INT                                                      \
   {                                                                            \
-    eel_err_raise(INVALID_ARGUMENT_ERROR, NULL, __FILE__, __LINE__);           \
-    return INVALID_ARGUMENT_ERROR;                                             \
+    eel_err_raise(EEL_INVALID_ARG_ERROR, NULL, __FILE__, __LINE__);            \
+    return EEL_INVALID_ARG_ERROR;                                              \
   }
 
 #define RAISE_ARG_ERR_NULL                                                     \
   {                                                                            \
-    eel_err_raise(INVALID_ARGUMENT_ERROR, NULL, __FILE__, __LINE__);           \
+    eel_err_raise(EEL_INVALID_ARG_ERROR, NULL, __FILE__, __LINE__);            \
     return NULL;                                                               \
   }
 

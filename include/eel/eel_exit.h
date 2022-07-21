@@ -1,5 +1,5 @@
-#ifndef __EEL_EXIT__
-#define __EEL_EXIT__
+#ifndef __EEL_EXIT_H__
+#define __EEL_EXIT_H__
 
 #include <stdbool.h>
 

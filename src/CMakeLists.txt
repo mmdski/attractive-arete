@@ -2,6 +2,7 @@ add_library(eel
   error.c
   exit.c
   memory.c
+  posix.c
   string.c
 )
 

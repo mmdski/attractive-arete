@@ -12,9 +12,7 @@
             __FILE__,                                                          \
             __LINE__);                                                         \
     exit(EXIT_FAILURE);                                                        \
-  }                                                                            \
-  printf("Test %s ran successfully\n", __FILE__);                              \
-  // return;
+  }
 
 #define STR(x) #x
 #define RUN_TEST_FUNC(func)                                                    \

@@ -8,11 +8,6 @@
 #include "error.h"
 #include "memory.h"
 
-struct _EelString {
-  long  len;
-  char *string;
-};
-
 static EelString
 eel_string_new_empty(long len) {
   EelString s;

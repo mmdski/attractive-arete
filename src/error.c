@@ -1,8 +1,11 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/param.h>
 
 #include <eel/eel_error.h>
 #include <eel/eel_exit.h>
+#include <eel/eel_posix.h>
 #include <eel/eel_io.h>
 
 #include "memory.h"
@@ -17,19 +20,19 @@ EelString
 eel_err_type_name(EelErrorType type) {
   char *error_name;
   switch (type) {
-  case NULL_ARGUMENT_ERROR:
+  case EEL_NULL_ARG_ERROR:
     error_name = "NullArgumentError";
     break;
-  case INVALID_ARGUMENT_ERROR:
+  case EEL_INVALID_ARG_ERROR:
     error_name = "InvalidArgumentError";
     break;
-  case MEMORY_ERROR:
+  case EEL_MEM_ERROR:
     error_name = "MemoryError";
     break;
-  case VALUE_ERROR:
+  case EEL_VALUE_ERROR:
     error_name = "ValueError";
     break;
-  case EXIT_CALLED:
+  case EEL_EXIT_CALLED:
     error_name = "ExitError";
     break;
   case GENERAL_ERROR:
@@ -50,7 +53,7 @@ eel_err_new(EelErrorType type, const char *message) {
   err->error_name = eel_err_type_name(type);
 
   if (message == NULL)
-    err->message = eel_string_new("");
+    err->message = NULL;
   else
     err->message = eel_string_new(message);
 
@@ -166,6 +169,7 @@ static struct _EelErrorStack stack = {NULL, NULL};
 
 static EelErrorStackNode *
 eel_err_stack_node_new(const char *file, int line) {
+
   if (file == NULL)
     return NULL;
 
@@ -174,10 +178,16 @@ eel_err_stack_node_new(const char *file, int line) {
 
   char node_string_buffer[500];
 
-  node->line = line;
-  node->file = eel_string_new(file);
+  char bname[MAXPATHLEN];
+  if (eel_basename(file, bname) != EEL_NO_ERROR) {
+    FREE(node);
+    return NULL;
+  }
 
-  eel_sprintf(node_string_buffer, "File \"%s\", line %i", file, line);
+  node->line = line;
+  node->file = eel_string_new(bname);
+
+  eel_sprintf(node_string_buffer, "File \"%s\", line %i", bname, line);
   node->string = eel_string_new(node_string_buffer);
 
   node->next = NULL;
@@ -205,7 +215,7 @@ eel_err_raise(EelErrorType type,
     fprintf(stderr, "Fatal error: Error raised while error in stack\n");
     eel_exit(EXIT_FAILURE);
 #ifdef TESTING
-    return EXIT_CALLED;
+    return EEL_EXIT_CALLED;
 #endif
   }
 
@@ -265,10 +275,18 @@ eel_err_stack_is_type(EelErrorType type) {
 
 void
 eel_err_stack_print(const char *file, int line) {
+
   if (stack.error == NULL)
     return;
 
-  fprintf(stderr, "Error stack print called from %s on line %i\n", file, line);
+  char bname[MAXPATHLEN];
+  if (eel_basename(file, bname)) {
+    fprintf(stderr, "Failed to print error stack\n.");
+    eel_exit(EXIT_FAILURE);
+  }
+
+  fprintf(
+      stderr, "Error stack print called from \"%s\" on line %i\n", bname, line);
   fprintf(stderr, "Stack trace (most recent call last):\n");
 
   char *string;
@@ -289,8 +307,16 @@ eel_err_stack_print(const char *file, int line) {
 void
 eel_err_stack_check(const char *file, int line) {
   if (eel_err_stack_is_err()) {
+
+    char bname[MAXPATHLEN];
+    if (eel_basename(file, bname)) {
+      fprintf(stderr, "Error stack check failed.\n");
+      eel_exit(EXIT_FAILURE);
+    }
+
     fprintf(stderr, "Unchecked error\n");
-    fprintf(stderr, "Error stack checked on %s, line %i\n", file, line);
+    fprintf(stderr, "Error stack checked on \"%s\", line %i\n", bname, line);
+
     eel_err_stack_print(__FILE__, __LINE__);
     eel_exit(EXIT_FAILURE);
   }
