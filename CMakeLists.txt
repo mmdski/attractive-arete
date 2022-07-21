@@ -8,12 +8,22 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 if(MSVC)
   add_compile_options(/guard:cf /analyze /permissive- /W4 /WX)
 
+  # add debug flags for ASAN build
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Asans")
+    add_compile_options(/Zi)
+  endif()
+
 else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
 
   if(COVERAGE)
     add_compile_options(--coverage)
     add_link_options(--coverage)
+  endif()
+
+  # add debug flags for ASAN build
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Asans")
+    add_compile_options(-g)
   endif()
 endif()
 

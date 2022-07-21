@@ -1,7 +1,12 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef _MSC_VER
 #include <sys/param.h>
+#else
+#define MAXPATHLEN _MAX_PATH
+#endif
 
 #include <eel/eel_error.h>
 #include <eel/eel_exit.h>

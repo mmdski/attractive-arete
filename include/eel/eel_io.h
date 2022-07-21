@@ -5,7 +5,7 @@
 
 #ifdef _MSC_VER
 
-#define eel_sprintf(buffer, size, format, ...)                                 \
+#define eel_snprintf(buffer, size, format, ...)                                \
   sprintf_s(buffer, size, format, __VA_ARGS__)
 
 #define eel_popen(command, mode) _popen(command, mode)
