@@ -25,6 +25,15 @@ struct _EelError {
 EelErrorType
 eel_err_type_name(EelErrorType type, char *error_name) {
   switch (type) {
+  case EEL_NO_ERROR:
+    eel_strlcpy(error_name, "NoErrorOccurred", MAXERRNAME);
+    break;
+  case EEL_SYS_ERROR:
+    eel_strlcpy(error_name, "SysError", MAXERRNAME);
+    break;
+  case EEL_POSIX_ERROR:
+    eel_strlcpy(error_name, "PosixError", MAXERRNAME);
+    break;
   case EEL_NULL_ARG_ERROR:
     eel_strlcpy(error_name, "NullArgumentError", MAXERRNAME);
     break;
@@ -37,11 +46,11 @@ eel_err_type_name(EelErrorType type, char *error_name) {
   case EEL_VALUE_ERROR:
     eel_strlcpy(error_name, "ValueError", MAXERRNAME);
     break;
+  case EEL_ERR_STACK_ERROR:
+    eel_strlcpy(error_name, "ErrorStackError", MAXERRNAME);
+    break;
   case EEL_EXIT_CALLED:
     eel_strlcpy(error_name, "ExitError", MAXERRNAME);
-    break;
-  case GENERAL_ERROR:
-    eel_strlcpy(error_name, "GeneralError", MAXERRNAME);
     break;
   default:
     eel_strlcpy(error_name, "UnnamedError", MAXERRNAME);

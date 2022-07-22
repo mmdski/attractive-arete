@@ -44,9 +44,6 @@ typedef enum {
   /** eel_exit() has been called */
   EEL_EXIT_CALLED,
 
-  /** General error */
-  GENERAL_ERROR,
-
   /** Number of error types **/
   NUM_ERROR_TYPES
 
@@ -56,6 +53,15 @@ typedef enum {
  * eel error object
  */
 typedef struct _EelError *EelError;
+
+/**
+ * @brief Writes the name of
+ *
+ * @param type
+ * @param error_name
+ * @return EelErrorType
+ */
+extern EelErrorType eel_err_type_name(EelErrorType type, char *error_name);
 
 /**
  * @brief Creates a new error object
