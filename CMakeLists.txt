@@ -44,9 +44,10 @@ macro(add_eel_exe basename)
   target_link_libraries(${basename} PRIVATE eel)
 endmacro()
 
-# if(APP)
-# add_subdirectory(app)
-# endif()
+if(APP)
+  add_subdirectory(app)
+endif()
+
 if(TESTS)
   include(CTest)
   add_subdirectory(tests)

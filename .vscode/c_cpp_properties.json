@@ -3,21 +3,21 @@
         {
             "name": "Fedora",
             "includePath": [
-                "~/src/emscripten/system/include",
                 "${workspaceFolder}/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "compilerArgs": [
-                "-DCHECK_ARGS"
+                "-DCHECK_ARGS",
+                "-DTESTING"
             ],
             "cStandard": "c99",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "linux-gcc-x64",
+            "configurationProvider": "ms-vscode.cmake-tools"
         },
         {
             "name": "Ubuntu",
             "includePath": [
-                "~/src/emscripten/system/include",
                 "${workspaceFolder}/**"
             ],
             "defines": [],
